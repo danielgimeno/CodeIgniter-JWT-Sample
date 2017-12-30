@@ -20,7 +20,7 @@ require APPPATH . '/libraries/REST_Controller.php';
 class Auth extends REST_Controller {
 
     /**
-     * URL: http://localhost/CodeIgniter-JWT-Sample/auth/token
+     * URL: http://local.jwt/auth/token
      * Method: POST
      */
     public function token_post() {
@@ -45,12 +45,16 @@ class Auth extends REST_Controller {
         }    
     }
 
+    /**
+     * Fake method valid_user_pswd
+     * return valid value
+     */
     public function valid_user_pswd($user,$pswd){
         return true;
     }
     
     /**
-     * URL: http://localhost/CodeIgniter-JWT-Sample/auth/tokenRetrieve
+     * URL: http://local.jwt/auth/tokenRetrieve
      * Method: POST
      * Header Key: Authorization
      * Value: Auth token generated in GET call
