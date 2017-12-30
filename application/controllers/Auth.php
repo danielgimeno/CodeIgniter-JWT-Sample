@@ -17,28 +17,45 @@ require APPPATH . '/libraries/REST_Controller.php';
  *
  */
 
-class Auth extends REST_Controller
-{
-    /**
-     * URL: http://localhost/CodeIgniter-JWT-Sample/auth/token
-     * Method: GET
-     */
-    public function token_get()
-    {
-        $tokenData = array();
-        $tokenData['id'] = 1; //TODO: Replace with data for token
-        $output['token'] = AUTHORIZATION::generateToken($tokenData);
-        $this->set_response($output, REST_Controller::HTTP_OK);
-    }
+class Auth extends REST_Controller {
 
     /**
      * URL: http://localhost/CodeIgniter-JWT-Sample/auth/token
      * Method: POST
+     */
+    public function token_post() {
+        $user = $this->post('username');
+        $pswd = $this->post('pswd');
+        //verificacion de usuario y paswd 
+        if ($this->valid_user_pswd($user,$pswd)){
+            $tokenData = array();
+            $tokenData['header'] = array("typ" => "JWT", "alg" => "HS256");
+            $tokenData['payload'] = array(
+                'sub' => $user,
+                'exp' => time() + (7 * 24 * 60 * 60),
+                'iat' => time(),
+                'jti' => 1
+            );
+
+            $output['token'] = AUTHORIZATION::generateToken($tokenData);
+            $this->set_response($output, REST_Controller::HTTP_OK);
+        } else
+        {
+             $this->set_response("Unauthoised", REST_Controller::HTTP_UNAUTHORIZED);
+        }    
+    }
+
+    public function valid_user_pswd($user,$pswd){
+        return true;
+    }
+    
+    /**
+     * URL: http://localhost/CodeIgniter-JWT-Sample/auth/tokenRetrieve
+     * Method: POST
      * Header Key: Authorization
      * Value: Auth token generated in GET call
      */
-    public function token_post()
-    {
+    public function tokenRetrieve_post() {
         $headers = $this->input->request_headers();
 
         if (array_key_exists('Authorization', $headers) && !empty($headers['Authorization'])) {
@@ -48,7 +65,7 @@ class Auth extends REST_Controller
                 return;
             }
         }
-
-        $this->set_response("Unauthorised", REST_Controller::HTTP_UNAUTHORIZED);
+        $this->set_response("Unauthoised", REST_Controller::HTTP_UNAUTHORIZED);
     }
+
 }
